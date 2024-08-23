@@ -15,7 +15,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/usuarios")
-@CrossOrigin(origins = "http://localhost:5173")  // Permitir solicitudes desde el origen de tu frontend
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")  // Permitir solicitudes desde el origen de tu frontend
 public class UsuarioController {
 
     @Autowired
@@ -50,10 +50,28 @@ public class UsuarioController {
         if (!usuarioExistente.isPresent()) {
             return ResponseEntity.notFound().build();
         }
-        usuario.setid_usuario(id);
-        Usuario usuarioActualizado = usuarioService.actualizarUsuario(usuario);
+
+        Usuario usuarioActual = usuarioExistente.get();
+        // Actualizar solo los campos que no sean nulos
+        if (usuario.getNombre() != null) {
+            usuarioActual.setNombre(usuario.getNombre());
+        }
+        if (usuario.getApellido() != null) {
+            usuarioActual.setApellido(usuario.getApellido());
+        }
+        if (usuario.getCorreo() != null) {
+            usuarioActual.setCorreo(usuario.getCorreo());
+        }
+        // Solo actualizar la contraseña si ha sido proporcionada
+        if (usuario.getContraseña() != null && !usuario.getContraseña().isEmpty()) {
+            usuarioActual.setContraseña(usuario.getContraseña());
+        }
+        usuarioActual.setEsAdmin(usuario.getEsAdmin());
+
+        Usuario usuarioActualizado = usuarioService.actualizarUsuario(usuarioActual);
         return new ResponseEntity<>(usuarioActualizado, HttpStatus.OK);
     }
+
 
     // Método para eliminar un usuario
     @DeleteMapping("/{id}")
