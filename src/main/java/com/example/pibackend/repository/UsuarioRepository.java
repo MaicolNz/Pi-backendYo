@@ -9,4 +9,5 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
     // Puedes definir métodos adicionales aquí si es necesario
     Optional<Usuario> findByCorreoAndContraseña(String correo, String contraseña);
 
+
 }
